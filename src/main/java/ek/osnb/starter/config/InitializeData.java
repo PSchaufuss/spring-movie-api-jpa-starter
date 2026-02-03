@@ -1,14 +1,10 @@
 package ek.osnb.starter.config;
 
-import ek.osnb.starter.model.Actor;
-import ek.osnb.starter.model.Movie;
 import ek.osnb.starter.repository.ActorRepository;
 import ek.osnb.starter.repository.MovieRepository;
 import ek.osnb.starter.service.ActorService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.util.Set;
 
 @Component
 public class InitializeData implements CommandLineRunner {
