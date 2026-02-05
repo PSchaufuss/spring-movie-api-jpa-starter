@@ -3,7 +3,9 @@ package ek.osnb.starter.service;
 import ek.osnb.starter.exceptions.NotFoundException;
 import ek.osnb.starter.model.Actor;
 import ek.osnb.starter.model.Movie;
+import ek.osnb.starter.model.MovieDetails;
 import ek.osnb.starter.repository.ActorRepository;
+import ek.osnb.starter.repository.MovieDetailsRepository;
 import ek.osnb.starter.repository.MovieRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +16,15 @@ import java.util.Optional;
 public class MovieService {
     private final MovieRepository movieRepository;
     private final ActorRepository actorRepository;
+    private final MovieDetailsRepository movieDetailsRepository;
 
-    public MovieService(MovieRepository movieRepository, ActorRepository actorRepository) {
+    public MovieService(MovieRepository movieRepository,
+                        ActorRepository actorRepository,
+                        MovieDetailsRepository movieDetailsRepository)
+    {
         this.movieRepository = movieRepository;
         this.actorRepository = actorRepository;
+        this.movieDetailsRepository = movieDetailsRepository;
     }
 
     public Movie createMovie(Movie movie) {
@@ -52,6 +59,19 @@ public class MovieService {
                 .orElseThrow(() -> new NotFoundException("Actor not found"));
 
         movie.getActors().add(actor);
+
+        return movieRepository.save(movie);
+    }
+
+    public Movie addDetailsToMovie(Long movieId, MovieDetails details)
+    {
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new NotFoundException("Movie not found"));
+
+        movieDetailsRepository.save(details);
+
+        movie.setMovieDetails(details);
+        details.setMovie(movie);
 
         return movieRepository.save(movie);
     }
