@@ -21,6 +21,15 @@ public class MovieController {
         return ResponseEntity.ok(movieService.createMovie(movie));
     }
 
+    @PostMapping("/{movieId}/actors/{actorId}")
+    public ResponseEntity<Movie> addActorToMovie(
+            @PathVariable Long movieId,
+            @PathVariable Long actorId)
+    {
+        Movie updatedMovie = movieService.addActorToMovie(movieId, actorId);
+        return ResponseEntity.ok(updatedMovie);
+    }
+
     @GetMapping
     public ResponseEntity<List<Movie>> getAllMovies() {
         return ResponseEntity.ok(movieService.getAllMovies());

@@ -1,7 +1,9 @@
 package ek.osnb.starter.service;
 
 import ek.osnb.starter.exceptions.NotFoundException;
+import ek.osnb.starter.model.Actor;
 import ek.osnb.starter.model.Movie;
+import ek.osnb.starter.repository.ActorRepository;
 import ek.osnb.starter.repository.MovieRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +13,11 @@ import java.util.Optional;
 @Service
 public class MovieService {
     private final MovieRepository movieRepository;
+    private final ActorRepository actorRepository;
 
-    public MovieService(MovieRepository movieRepository) {
+    public MovieService(MovieRepository movieRepository, ActorRepository actorRepository) {
         this.movieRepository = movieRepository;
+        this.actorRepository = actorRepository;
     }
 
     public Movie createMovie(Movie movie) {
@@ -37,5 +41,18 @@ public class MovieService {
 
     public void deleteMovie(Long id) {
         movieRepository.deleteById(id);
+    }
+
+    public Movie addActorToMovie(Long movieId, Long actorId)
+    {
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new NotFoundException("Movie not found"));
+
+        Actor actor = actorRepository.findById(actorId)
+                .orElseThrow(() -> new NotFoundException("Actor not found"));
+
+        movie.getActors().add(actor);
+
+        return movieRepository.save(movie);
     }
 }

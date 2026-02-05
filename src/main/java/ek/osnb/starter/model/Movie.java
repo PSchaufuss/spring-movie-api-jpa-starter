@@ -2,6 +2,9 @@ package ek.osnb.starter.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Movie {
     @Id
@@ -11,6 +14,14 @@ public class Movie {
     private String title;
     private Integer releaseYear;
     private String genre;
+
+    @ManyToMany
+    @JoinTable(
+            name = "movie_actor",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "actor_id")
+    )
+    private List<Actor> actors = new ArrayList<>();
 
     @Embedded
     private Rating rating;
@@ -22,6 +33,18 @@ public class Movie {
         this.releaseYear = releaseYear;
         this.genre = genre;
         this.rating = rating;
+    }
+
+
+
+    public List<Actor> getActors()
+    {
+        return actors;
+    }
+
+    public void setActors(List<Actor> actors)
+    {
+        this.actors = actors;
     }
 
     public Long getId() {
