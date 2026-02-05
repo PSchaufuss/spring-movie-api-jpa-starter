@@ -1,14 +1,20 @@
 package ek.osnb.starter.service;
 
+import ek.osnb.starter.dto.ActorResponse;
+import ek.osnb.starter.dto.CreateMovieRequest;
+import ek.osnb.starter.dto.MovieDetailsResponse;
+import ek.osnb.starter.dto.MovieResponse;
 import ek.osnb.starter.exceptions.NotFoundException;
 import ek.osnb.starter.model.Actor;
 import ek.osnb.starter.model.Movie;
 import ek.osnb.starter.model.MovieDetails;
+import ek.osnb.starter.model.Rating;
 import ek.osnb.starter.repository.ActorRepository;
 import ek.osnb.starter.repository.MovieDetailsRepository;
 import ek.osnb.starter.repository.MovieRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,24 +33,31 @@ public class MovieService {
         this.movieDetailsRepository = movieDetailsRepository;
     }
 
-    public Movie createMovie(Movie movie) {
-        return movieRepository.save(movie);
+    public MovieResponse createMovie(CreateMovieRequest request)
+    {
+        Movie movie = toMovieEntity(request);
+        Movie saved = movieRepository.save(movie);
+        return toMovieResponse(saved);
     }
 
-    public List<Movie> getAllMovies() {
-        return movieRepository.findAll();
-    }
+    public List<MovieResponse> getAllMovies()
+    {
+        var movies =movieRepository.findAll();
+        List<MovieResponse> responses = new ArrayList<>();
 
-    public Movie getMovieById(Long id) {
-        Optional<Movie> movieOptional = movieRepository.findById(id);
-        if (movieOptional.isEmpty()) {
-            throw new NotFoundException("Movie not found with id: " + id);
+        for (Movie m : movies)
+        {
+            responses.add(toMovieResponse(m));
         }
-        // Or use shortcut:
-        // return movieRepository.findById(id).orElseThrow(() -> new NotFoundException("Movie not found with id: " + id));
-
-        return movieOptional.get();
+        return responses;
     }
+
+    public MovieResponse getMovieById(Long id) {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Movie not found"));
+        return toMovieResponse(movie);
+    }
+
 
     public void deleteMovie(Long id) {
         movieRepository.deleteById(id);
@@ -72,5 +85,54 @@ public class MovieService {
         details.setMovie(movie);
 
         return movieRepository.save(movie);
+    }
+
+    private MovieResponse toMovieResponse(Movie movie)
+    {
+        MovieDetailsResponse details = null;
+        if (movie.getMovieDetails() != null)
+        {
+            details = new MovieDetailsResponse(
+                    movie.getMovieDetails().getPlot(),
+                    movie.getMovieDetails().getBudget(),
+                    movie.getMovieDetails().getRuntime(),
+                    movie.getMovieDetails().getProductionCompany()
+            );
+        }
+
+        List<ActorResponse> actors = movie.getActors().stream()
+                .map(a -> new ActorResponse(
+                        a.getId(),
+                        a.getName(),
+                        a.getBirthYear()
+                ))
+                .toList();
+
+        return new MovieResponse(
+                movie.getId(),
+                movie.getTitle(),
+                movie.getReleaseYear(),
+                movie.getGenre(),
+                movie.getRating() != null ? movie.getRating().getScore() : null,
+                movie.getRating() != null ? movie.getRating().getVoteCount() : null,
+                details,
+                actors
+        );
+    }
+
+    private Movie toMovieEntity(CreateMovieRequest request)
+    {
+        Rating rating = null;
+        if (request.ratingScore() != null && request.ratingVoteCount() != null)
+        {
+            rating = new Rating(request.ratingScore(), request.ratingVoteCount());
+        }
+
+        return new Movie(
+                request.title(),
+                request.releaseYear(),
+                request.genre(),
+                rating
+        );
     }
 }

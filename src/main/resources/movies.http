@@ -100,3 +100,29 @@ GET http://localhost:8080/api/movies/1
 
 ### OPTIONAL: DELETE MOVIE WITH CASCADE
 DELETE http://localhost:8080/api/movies/1
+
+### ADD MOVIE
+POST http://localhost:8080/api/movies
+Content-Type: application/json
+
+{
+  "title": "The Matrix",
+  "releaseYear": 1999,
+  "genre": "Sci-Fi",
+  "ratingScore": 8.7,
+  "ratingVoteCount": 1800000
+}
+
+### ADD DETAILS
+POST http://localhost:8080/api/movies/1/details
+Content-Type: application/json
+
+{
+  "plot": "Neo discovers the truth...",
+  "budget": 63000000,
+  "runtime": 136,
+  "productionCompany": "Warner Bros"
+}
+
+### VERIFY MOVIE WITH DETAILS
+GET http://localhost:8080/api/movies/1
