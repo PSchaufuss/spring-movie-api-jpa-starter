@@ -68,8 +68,6 @@ public class MovieService {
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new NotFoundException("Movie not found"));
 
-        movieDetailsRepository.save(details);
-
         movie.setMovieDetails(details);
         details.setMovie(movie);
 

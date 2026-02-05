@@ -27,7 +27,7 @@ public class Movie {
     @Embedded
     private Rating rating;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinColumn(name = "movie_details_id")
     @JsonManagedReference
     private MovieDetails movieDetails;
